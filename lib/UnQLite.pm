@@ -2,17 +2,29 @@ package UnQLite;
 use 5.008005;
 use strict;
 use warnings;
+use Carp ();
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 our $rc = 0;
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
 
-sub rc { $UnQLite::rc }
+sub TIEHASH {
+    my $class = shift;
+    my $self = $class->open(@_) or Carp::croak $class->errstr;
+    $self->cursor_init;
+}
+
+sub rc {
+    my $self = shift;
+    my $_rc = _rc($self);
+    defined $_rc ? $rc = $_rc : $rc;
+}
 
 sub errstr {
     my $self = shift;
+    my $rc = $self->rc;
     if ($rc==UnQLite::UNQLITE_OK()) { return "UNQLITE_OK" }
     if ($rc==UNQLITE_NOMEM()) { return "UNQLITE_NOMEM" }
     if ($rc==UNQLITE_ABORT()) { return "UNQLITE_ABORT" }
@@ -45,6 +57,12 @@ sub cursor_init {
 }
 
 package UnQLite::Cursor;
+
+sub rc {
+    my $self = shift;
+    my $_rc = _rc($self->[0]);
+    defined $_rc ? $UnQLite::rc = $_rc : $UnQLite::rc;
+}
 
 sub first_entry {
     my $self = shift;
@@ -96,6 +114,62 @@ sub DESTROY {
     _release($self->[0], $self->[1]);
 }
 
+# tie interface
+
+sub FETCH {
+    my ($self, $key) = @_;
+    $self->[1]->kv_fetch($key);
+}
+
+sub STORE {
+    my ($self, $key, $value) = @_;
+    $self->[1]->kv_store($key, $value) or Carp::croak $self->[1]->errstr;
+    $value;
+}
+
+sub DELETE {
+    my ($self, $key) = @_;
+    my $prev = $self->[1]->kv_fetch($key);
+    my $errstr = $self->[1]->errstr;
+    return unless $errstr && $errstr eq 'UNQLITE_OK';
+    $self->[1]->kv_delete($key) or Carp::croak $self->[1]->errstr;
+    $prev;
+}
+
+sub FIRSTKEY {
+    my $self = shift;
+    $self->first_entry or return;
+    $self->key;
+}
+
+sub NEXTKEY {
+    my $self = shift;
+    $self->next_entry or return;
+    $self->key;
+}
+
+sub EXISTS {
+    my ($self, $key) = @_;
+    $self->[1]->kv_fetch($key) and return 1;
+    my $errstr = $self->[1]->errstr;
+    return $errstr && $errstr eq 'UNQLITE_OK' ? 1 : 0;
+}
+
+sub CLEAR {
+    my $self = shift;
+    $self->first_entry or return;
+    $self->delete_entry while $self->valid_entry;
+    return;
+}
+
+sub SCALAR {
+    my $self = shift;
+    $self->first_entry or return;
+    my $ct = 1;
+    $ct++ while $self->next_entry && $self->valid_entry;
+    return $ct;
+}
+
 1;
 __END__
 
@@ -116,6 +190,11 @@ UnQLite - Perl bindings for UnQLite
     say $db->kv_fetch('foo'); # => bar
     $db->kv_delete('foo');
     undef $db; # close database
+
+    # tie interface
+    tie my %hash, 'UnQLite', 'foo.db';
+    $hash{foo} = 'bar';
+    say $hash{foo}; # => bar
 
 =head1 DESCRIPTION
 

@@ -27,7 +27,7 @@ no_index:
 provides:
   UnQLite:
     file: lib/UnQLite.pm
-    version: 0.01
+    version: 0.02
   UnQLite::Cursor:
     file: lib/UnQLite.pm
 requires:
@@ -36,4 +36,6 @@ resources:
   bugtracker: https://github.com/tokuhirom/UnQLite/issues
   homepage: https://github.com/tokuhirom/UnQLite
   repository: git://github.com/tokuhirom/UnQLite.git
-version: 0.01
+version: 0.02
+x_contributors:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'

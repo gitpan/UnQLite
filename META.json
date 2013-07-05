@@ -52,7 +52,7 @@
    "provides" : {
       "UnQLite" : {
          "file" : "lib/UnQLite.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "UnQLite::Cursor" : {
          "file" : "lib/UnQLite.pm"
@@ -69,5 +69,8 @@
          "web" : "https://github.com/tokuhirom/UnQLite"
       }
    },
-   "version" : "0.01"
+   "version" : "0.02",
+   "x_contributors" : [
+      "Kenichi Ishigaki <ishigaki@cpan.org>"
+   ]
 }

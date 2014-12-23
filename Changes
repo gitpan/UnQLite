@@ -1,5 +1,9 @@
 Revision history for Perl extension Unqlite
 
+0.05 2014-12-23T22:55:15Z
+
+    - Doc fix
+
 0.04 2014-08-30T09:33:52Z
 
     - Fixed packaging issue.

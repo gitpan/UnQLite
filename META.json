@@ -4,7 +4,7 @@
       "tokuhirom <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.1.1",
+   "generated_by" : "Minilla/v2.2.0",
    "license" : [
       "perl_5"
    ],
@@ -54,7 +54,7 @@
    "provides" : {
       "UnQLite" : {
          "file" : "lib/UnQLite.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "UnQLite::Cursor" : {
          "file" : "lib/UnQLite.pm"
@@ -71,7 +71,7 @@
          "web" : "https://github.com/tokuhirom/UnQLite"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "Kenichi Ishigaki <ishigaki@cpan.org>",
       "Reini Urban <rurban@cpanel.net>"
